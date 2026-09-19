@@ -1,0 +1,64 @@
+.root-vbox {
+    -fx-background-color: #1e1e2e;
+}
+
+.expression-label {
+    -fx-text-fill: #6c7086;
+    -fx-font-size: 13px;
+    -fx-min-height: 18px;
+}
+
+.result-label {
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 38px;
+    -fx-font-weight: bold;
+    -fx-min-height: 55px;
+}
+
+.num-btn {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 18px;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.num-btn:hover { -fx-background-color: #45475a; }
+
+.op-btn {
+    -fx-background-color: #f38ba8;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.op-btn:hover { -fx-background-color: #f5a0b5; }
+
+.sci-btn {
+    -fx-background-color: #45475a;
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.sci-btn:hover { -fx-background-color: #585b70; }
+
+.clear-btn {
+    -fx-background-color: #fab387;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.clear-btn:hover { -fx-background-color: #f9c0a0; }
+
+.eq-btn {
+    -fx-background-color: #a6e3a1;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.eq-btn:hover { -fx-background-color: #b8f0b4; }
