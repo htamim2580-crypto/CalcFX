@@ -1,24 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.calcfx.HelloController"
-      styleClass="root-vbox" spacing="8">
+      styleClass="root-vbox" spacing="4">
     <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="8">
+        <Label fx:id="statusLabel" text="DEG" styleClass="status-label"
+               maxWidth="Infinity" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="currencyToggle" text="💱" onAction="#onToggleCurrency" styleClass="toggle-btn"/>
+    </HBox>
 
     <Label fx:id="expressionLabel" text="" styleClass="expression-label"
            maxWidth="Infinity" alignment="CENTER_RIGHT"/>
     <Label fx:id="resultLabel" text="0" styleClass="result-label"
            maxWidth="Infinity" alignment="CENTER_RIGHT"/>
 
-    <GridPane hgap="6" vgap="6">
+    <GridPane fx:id="calculatorGrid" hgap="6" vgap="6">
         <columnConstraints>
             <ColumnConstraints percentWidth="25"/>
             <ColumnConstraints percentWidth="25"/>
@@ -26,55 +36,79 @@
             <ColumnConstraints percentWidth="25"/>
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints minHeight="52"/>
-            <RowConstraints minHeight="52"/>
-            <RowConstraints minHeight="52"/>
-            <RowConstraints minHeight="52"/>
-            <RowConstraints minHeight="52"/>
-            <RowConstraints minHeight="52"/>
-            <RowConstraints minHeight="52"/>
+            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+            <RowConstraints minHeight="48"/>
         </rowConstraints>
 
-        <!-- Row 0: sin cos tan log -->
-        <Button text="sin"  onAction="#onSin"    styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <Button text="cos"  onAction="#onCos"    styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-        <Button text="tan"  onAction="#onTan"    styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-        <Button text="log"  onAction="#onLog"    styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+        <!-- Row 0: ( ) % ⌫ -->
+        <Button text="(" onAction="#onOpenParen"  styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <Button text=")" onAction="#onCloseParen" styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <Button text="\%" onAction="#onPercent"   styleClass="op-btn"    maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+        <Button text="⌫" onAction="#onBackspace"  styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
-        <!-- Row 1: ln √ x² xʸ -->
-        <Button text="ln"   onAction="#onLn"     styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <Button text="√"    onAction="#onSqrt"   styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <Button text="x²"   onAction="#onSquare" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-        <Button text="xʸ"   onAction="#onPower"  styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+        <!-- Row 1: sin cos tan log -->
+        <Button text="sin" onAction="#onSin" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <Button text="cos" onAction="#onCos" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Button text="tan" onAction="#onTan" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+        <Button text="log" onAction="#onLog" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
 
-        <!-- Row 2: π e C ⌫ -->
-        <Button text="π"    onAction="#onPi"       styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-        <Button text="e"    onAction="#onE"         styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        <Button text="C"    onAction="#onClear"     styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
-        <Button text="⌫"    onAction="#onBackspace" styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+        <!-- Row 2: ln √ x² xʸ -->
+        <Button text="ln" onAction="#onLn"     styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <Button text="√"  onAction="#onSqrt"   styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <Button text="x²" onAction="#onSquare" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+        <Button text="xʸ" onAction="#onPower"  styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
 
-        <!-- Row 3: 7 8 9 ÷ -->
-        <Button text="7" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <Button text="8" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-        <Button text="9" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
-        <Button text="÷" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+        <!-- Row 3: MC MR M+ M- -->
+        <Button text="MC" onAction="#onMemoryClear"    styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <Button text="MR" onAction="#onMemoryRecall"   styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <Button text="M+" onAction="#onMemoryAdd"      styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+        <Button text="M-" onAction="#onMemorySubtract" styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
 
-        <!-- Row 4: 4 5 6 × -->
-        <Button text="4" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-        <Button text="5" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-        <Button text="6" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
-        <Button text="×" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
+        <!-- Row 4: Deg π e C -->
+        <Button fx:id="angleModeButton" text="Deg" onAction="#onToggleAngleMode" styleClass="toggle-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <Button text="π" onAction="#onPi"    styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        <Button text="e" onAction="#onE"     styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+        <Button text="C" onAction="#onClear" styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
 
-        <!-- Row 5: 1 2 3 − -->
-        <Button text="1" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-        <Button text="2" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-        <Button text="3" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
-        <Button text="−" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="5"/>
+        <!-- Row 5: 7 8 9 ÷ -->
+        <Button text="7" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+        <Button text="8" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        <Button text="9" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+        <Button text="÷" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="5"/>
 
-        <!-- Row 6: 0 . = + -->
-        <Button text="0" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-        <Button text="." onAction="#onDot"      styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-        <Button text="=" onAction="#onEquals"   styleClass="eq-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="6"/>
-        <Button text="+" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="6"/>
+        <!-- Row 6: 4 5 6 × -->
+        <Button text="4" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+        <Button text="5" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <Button text="6" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="6"/>
+        <Button text="×" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="6"/>
+
+        <!-- Row 7: 1 2 3 − -->
+        <Button text="1" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+        <Button text="2" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+        <Button text="3" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="7"/>
+        <Button text="−" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="7"/>
+
+        <!-- Row 8: 0 . = + -->
+        <Button text="0" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+        <Button text="." onAction="#onDot"      styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+        <Button text="=" onAction="#onEquals"   styleClass="eq-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="8"/>
+        <Button text="+" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="8"/>
     </GridPane>
+
+    <!-- Currency converter panel (hidden until 💱 is pressed) -->
+    <VBox fx:id="currencyPane" spacing="14" visible="false" managed="false" styleClass="currency-pane">
+        <Label text="Currency Converter" styleClass="currency-title" maxWidth="Infinity" alignment="CENTER"/>
+        <TextField fx:id="amountField" promptText="Amount" styleClass="amount-field"/>
+        <HBox spacing="8" alignment="CENTER">
+            <ComboBox fx:id="fromCurrency" promptText="From" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="⇄" onAction="#onSwapCurrencies" styleClass="paren-btn"/>
+            <ComboBox fx:id="toCurrency" promptText="To" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <Button text="Convert" onAction="#onConvert" styleClass="eq-btn convert-btn" maxWidth="Infinity"/>
+        <Label fx:id="conversionResultLabel" text="" styleClass="conversion-result" maxWidth="Infinity" alignment="CENTER"/>
+        <Label fx:id="rateInfoLabel" text="" styleClass="rate-info" maxWidth="Infinity" alignment="CENTER"/>
+    </VBox>
 </VBox>

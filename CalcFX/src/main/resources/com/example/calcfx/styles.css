@@ -2,6 +2,12 @@
     -fx-background-color: #1e1e2e;
 }
 
+.status-label {
+    -fx-text-fill: #6c7086;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
 .expression-label {
     -fx-text-fill: #6c7086;
     -fx-font-size: 13px;
@@ -62,3 +68,57 @@
     -fx-cursor: hand;
 }
 .eq-btn:hover { -fx-background-color: #b8f0b4; }
+
+.paren-btn {
+    -fx-background-color: #89b4fa;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.paren-btn:hover { -fx-background-color: #a6c8fc; }
+
+.mem-btn {
+    -fx-background-color: #74c7ec;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.mem-btn:hover { -fx-background-color: #8ed4f0; }
+
+.toggle-btn {
+    -fx-background-color: #cba6f7;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 13px;
+
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.toggle-btn:hover { -fx-background-color: #dcbbfb; }
+/* --- Currency converter --- */
+.currency-pane { -fx-padding: 24 4 0 4; }
+.currency-title { -fx-text-fill: #cdd6f4; -fx-font-size: 18px; -fx-font-weight: bold; }
+.amount-field {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #6c7086;
+    -fx-font-size: 16px;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+.currency-pane .combo-box {
+    -fx-background-color: #45475a;
+    -fx-background-radius: 8;
+}
+.currency-pane .combo-box .list-cell { -fx-text-fill: #cdd6f4; }
+.currency-pane .combo-box-popup .list-view { -fx-background-color: #313244; -fx-border-color: #45475a; }
+.currency-pane .combo-box-popup .list-cell { -fx-text-fill: #cdd6f4; -fx-background-color: #313244; }
+.currency-pane .combo-box-popup .list-cell:hover,
+.currency-pane .combo-box-popup .list-cell:selected { -fx-background-color: #45475a; }
+.convert-btn { -fx-padding: 12; }
+.conversion-result { -fx-text-fill: #a6e3a1; -fx-font-size: 22px; -fx-font-weight: bold; -fx-min-height: 30px; }
+.rate-info { -fx-text-fill: #6c7086; -fx-font-size: 12px; }
