@@ -125,6 +125,7 @@
         <VBox fx:id="historyPane" spacing="10" visible="false" managed="false" styleClass="history-pane" VBox.vgrow="ALWAYS">
             <HBox alignment="CENTER_LEFT" spacing="8">
                 <Label text="History" styleClass="currency-title" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button text="Edit" onAction="#onEditHistoryEntry" styleClass="edit-history-btn"/>
                 <Button text="Clear" onAction="#onClearHistory" styleClass="clear-history-btn"/>
             </HBox>
             <ListView fx:id="historyListView" styleClass="history-list" VBox.vgrow="ALWAYS"/>

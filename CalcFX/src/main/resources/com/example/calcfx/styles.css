@@ -215,3 +215,13 @@
     -fx-text-fill: #1e1e2e;
 }
 .mode-btn-active:hover { -fx-background-color: #a6c8fc; }
+.edit-history-btn {
+    -fx-background-color: #89b4fa;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 6 12 6 12;
+}
+.edit-history-btn:hover { -fx-background-color: #a6c8fc; }

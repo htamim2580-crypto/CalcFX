@@ -24,6 +24,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javafx.scene.control.TextInputDialog;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -332,7 +334,27 @@ public class HelloController {
         db.clearHistory();
         refreshHistory();
     }
+    @FXML protected void onEditHistoryEntry() {
+        DatabaseManager.HistoryEntry selected = historyListView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
 
+        TextInputDialog exprDialog = new TextInputDialog(selected.expression());
+        exprDialog.setTitle("Edit History Entry");
+        exprDialog.setHeaderText(null);
+        exprDialog.setContentText("Expression:");
+        Optional<String> newExpr = exprDialog.showAndWait();
+        if (newExpr.isEmpty() || newExpr.get().trim().isEmpty()) return;
+
+        TextInputDialog resultDialog = new TextInputDialog(selected.result());
+        resultDialog.setTitle("Edit History Entry");
+        resultDialog.setHeaderText(null);
+        resultDialog.setContentText("Result:");
+        Optional<String> newResult = resultDialog.showAndWait();
+        if (newResult.isEmpty() || newResult.get().trim().isEmpty()) return;
+
+        db.updateEntry(selected.id(), newExpr.get().trim(), newResult.get().trim());
+        refreshHistory();
+    }
     // ---------- Graphing ----------
 
     private void setupGraph() {
