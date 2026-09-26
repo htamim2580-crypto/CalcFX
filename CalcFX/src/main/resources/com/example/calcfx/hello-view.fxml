@@ -26,6 +26,7 @@
         <HBox alignment="CENTER_LEFT" spacing="8">
             <Label fx:id="statusLabel" text="DEG" styleClass="status-label"
                    maxWidth="Infinity" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="calculusToggle" text="∂" onAction="#onToggleCalculus" styleClass="toggle-btn"/>
             <Button fx:id="graphToggle" text="📈" onAction="#onToggleGraph" styleClass="toggle-btn"/>
             <Button fx:id="historyToggle" text="🕘" onAction="#onToggleHistory" styleClass="toggle-btn"/>
             <Button fx:id="currencyToggle" text="💱" onAction="#onToggleCurrency" styleClass="toggle-btn"/>
@@ -127,6 +128,30 @@
                 <Button text="Clear" onAction="#onClearHistory" styleClass="clear-history-btn"/>
             </HBox>
             <ListView fx:id="historyListView" styleClass="history-list" VBox.vgrow="ALWAYS"/>
+        </VBox>
+        <!-- Calculus panel (hidden until ∂ is pressed) -->
+        <VBox fx:id="calculusPane" spacing="14" visible="false" managed="false" styleClass="currency-pane">
+            <Label text="Calculus" styleClass="currency-title" maxWidth="Infinity" alignment="CENTER"/>
+            <TextField fx:id="calcFunctionField" promptText="f(x), e.g. sin(x) or x^2" styleClass="amount-field"/>
+
+            <HBox spacing="8" alignment="CENTER">
+                <Button fx:id="derivativeModeButton" text="Derivative" onAction="#onSelectDerivativeMode" styleClass="mode-btn mode-btn-active" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="integralModeButton" text="Integral" onAction="#onSelectIntegralMode" styleClass="mode-btn" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <VBox fx:id="derivativeInputs" spacing="8">
+                <TextField fx:id="pointField" promptText="x = (point to evaluate at)" styleClass="amount-field"/>
+            </VBox>
+
+            <VBox fx:id="integralInputs" spacing="8" visible="false" managed="false">
+                <HBox spacing="8">
+                    <TextField fx:id="lowerBoundField" promptText="a = (lower bound)" styleClass="amount-field" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="upperBoundField" promptText="b = (upper bound)" styleClass="amount-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+
+            <Button text="Calculate" onAction="#onCalculateCalculus" styleClass="eq-btn convert-btn" maxWidth="Infinity"/>
+            <Label fx:id="calcResultLabel" text="" styleClass="conversion-result" maxWidth="Infinity" alignment="CENTER" wrapText="true"/>
         </VBox>
     </VBox>
 

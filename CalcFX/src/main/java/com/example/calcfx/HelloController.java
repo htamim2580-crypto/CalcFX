@@ -27,13 +27,14 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class HelloController {
 
-    private enum ViewMode { CALCULATOR, CURRENCY, HISTORY, GRAPH }
+    private enum ViewMode { CALCULATOR, CURRENCY, HISTORY, GRAPH, CALCULUS }
 
     @FXML private Label statusLabel;
     @FXML private Label expressionLabel;
@@ -50,6 +51,20 @@ public class HelloController {
     @FXML private Label conversionResultLabel;
     @FXML private Label rateInfoLabel;
 
+    // Calculus controls
+    @FXML private Button calculusToggle;
+    @FXML private VBox calculusPane;
+    @FXML private TextField calcFunctionField;
+    @FXML private Button derivativeModeButton;
+    @FXML private Button integralModeButton;
+    @FXML private VBox derivativeInputs;
+    @FXML private VBox integralInputs;
+    @FXML private TextField pointField;
+    @FXML private TextField lowerBoundField;
+    @FXML private TextField upperBoundField;
+    @FXML private Label calcResultLabel;
+
+    private boolean derivativeMode = true;
     // History controls
     @FXML private Button historyToggle;
     @FXML private VBox historyPane;
@@ -125,6 +140,7 @@ public class HelloController {
 
         setupHistoryList();
         setupGraph();
+        updateCalcModeUI();
     }
 
     // ---------- View switching ----------
@@ -133,6 +149,53 @@ public class HelloController {
     @FXML protected void onToggleHistory() { setView(ViewMode.HISTORY); }
     @FXML protected void onToggleGraph() { setView(ViewMode.GRAPH); }
 
+    @FXML protected void onToggleCalculus() { setView(ViewMode.CALCULUS); }
+
+    @FXML protected void onSelectDerivativeMode() { derivativeMode = true; updateCalcModeUI(); }
+    @FXML protected void onSelectIntegralMode() { derivativeMode = false; updateCalcModeUI(); }
+
+    private void updateCalcModeUI() {
+        derivativeInputs.setVisible(derivativeMode);
+        derivativeInputs.setManaged(derivativeMode);
+        integralInputs.setVisible(!derivativeMode);
+        integralInputs.setManaged(!derivativeMode);
+
+        derivativeModeButton.getStyleClass().remove("mode-btn-active");
+        integralModeButton.getStyleClass().remove("mode-btn-active");
+        if (derivativeMode) derivativeModeButton.getStyleClass().add("mode-btn-active");
+        else integralModeButton.getStyleClass().add("mode-btn-active");
+
+        calcResultLabel.setText("");
+    }
+
+    @FXML protected void onCalculateCalculus() {
+        String funcText = calcFunctionField.getText().trim();
+        if (funcText.isEmpty()) {
+            calcResultLabel.setText("Enter a function first");
+            return;
+        }
+        try {
+            DoubleUnaryOperator f = GraphEngine.parseFunctionOfX(funcText);
+            if (derivativeMode) {
+                double x0 = Double.parseDouble(pointField.getText().trim());
+                double slope = Calculus.differentiate(f, x0);
+                String result = formatResult(slope);
+                calcResultLabel.setText("f'(" + formatResult(x0) + ") ≈ " + result);
+                db.saveCalculation("d/dx[" + funcText + "] at x=" + formatResult(x0), result);
+            } else {
+                double a = Double.parseDouble(lowerBoundField.getText().trim());
+                double b = Double.parseDouble(upperBoundField.getText().trim());
+                double area = Calculus.integrate(f, a, b);
+                String result = formatResult(area);
+                calcResultLabel.setText("∫ from " + formatResult(a) + " to " + formatResult(b) + " ≈ " + result);
+                db.saveCalculation("∫[" + funcText + "]dx, " + formatResult(a) + "→" + formatResult(b), result);
+            }
+        } catch (NumberFormatException e) {
+            calcResultLabel.setText("Enter valid numbers");
+        } catch (Exception e) {
+            calcResultLabel.setText("Error: check your function and inputs");
+        }
+    }
     private void setView(ViewMode requested) {
         ViewMode previous = currentView;
         currentView = (currentView == requested) ? ViewMode.CALCULATOR : requested;
@@ -141,6 +204,7 @@ public class HelloController {
         boolean curr = currentView == ViewMode.CURRENCY;
         boolean hist = currentView == ViewMode.HISTORY;
         boolean graph = currentView == ViewMode.GRAPH;
+        boolean calculus = currentView == ViewMode.CALCULUS;
 
         calculatorGrid.setVisible(calc);
         calculatorGrid.setManaged(calc);
@@ -150,10 +214,13 @@ public class HelloController {
         historyPane.setManaged(hist);
         graphPane.setVisible(graph);
         graphPane.setManaged(graph);
+        calculusPane.setVisible(calculus);
+        calculusPane.setManaged(calculus);
 
         currencyToggle.setText(curr ? "🔢" : "💱");
         historyToggle.setText(hist ? "🔢" : "🕘");
         graphToggle.setText(graph ? "🔢" : "📈");
+        calculusToggle.setText(calculus ? "🔢" : "∂");
 
         resizeWindowForGraphView(previous, currentView);
 
@@ -161,7 +228,6 @@ public class HelloController {
         if (hist) refreshHistory();
         if (graph) requestGraphRedraw();
     }
-
     /** The graph needs real width beside the calculator, so grow/shrink the window when toggled. */
     private void resizeWindowForGraphView(ViewMode previous, ViewMode now) {
         if (resultLabel.getScene() == null) return;
@@ -325,11 +391,8 @@ public class HelloController {
         swatch.setPrefSize(14, 14);
         swatch.setStyle("-fx-background-color: " + toHex(row.color) + "; -fx-background-radius: 4;");
 
-        Label yEquals = new Label("y =");
-        yEquals.setStyle("-fx-text-fill: #cdd6f4; -fx-font-size: 13px;");
-
         TextField field = new TextField();
-        field.setPromptText("e.g. sin(x)");
+        field.setPromptText("e.g. y = 5x   or   sin(x) = cos(y)");
         field.getStyleClass().add("function-field");
         HBox.setHgrow(field, Priority.ALWAYS);
         field.textProperty().addListener((obs, o, n) -> scheduleGraphRedraw());
@@ -343,7 +406,7 @@ public class HelloController {
             requestGraphRedraw();
         });
 
-        HBox container = new HBox(8, swatch, yEquals, field, removeBtn);
+        HBox container = new HBox(8, swatch, field, removeBtn);
         container.setAlignment(Pos.CENTER_LEFT);
         row.container = container;
 
@@ -386,7 +449,11 @@ public class HelloController {
         }
         double xMin = graphXMin, xMax = graphXMax, yCenter = graphYCenter;
         double width = graphCanvas.getWidth(), height = graphCanvas.getHeight();
-        int samples = Math.max(2, (int) width);
+        double unitsPerPixel = (xMax - xMin) / width;
+        double yHalfRange = unitsPerPixel * height / 2.0;
+        double yMin = yCenter - yHalfRange, yMax = yCenter + yHalfRange;
+        int cols = clampGrid(width);
+        int rows = clampGrid(height);
 
         graphExecutor.submit(() -> {
             if (myRequestId != graphRequestSeq.get()) return; // already superseded, skip
@@ -394,11 +461,11 @@ public class HelloController {
             List<GraphEngine.PlotSeries> series = new ArrayList<>();
             for (int i = 0; i < expressions.size(); i++) {
                 try {
-                    GraphEngine.ParsedFunction fn = GraphEngine.parse(expressions.get(i));
-                    double[] ys = GraphEngine.sample(fn, xMin, xMax, samples);
-                    series.add(new GraphEngine.PlotSeries(colors.get(i), ys));
+                    GraphEngine.Equation eq = GraphEngine.parseEquation(expressions.get(i));
+                    List<double[]> segments = GraphEngine.traceImplicit(eq::diff, xMin, xMax, yMin, yMax, cols, rows);
+                    series.add(new GraphEngine.PlotSeries(colors.get(i), segments));
                 } catch (Exception ignored) {
-                    // invalid/incomplete expression while typing — just skip it
+                    // invalid/incomplete equation while typing — just skip it
                 }
             }
 
@@ -411,10 +478,25 @@ public class HelloController {
         });
     }
 
+    private int clampGrid(double pixelSize) {
+        int v = (int) (pixelSize / 5);
+        return Math.max(50, Math.min(160, v));
+    }
+
     // ---------- Digits / dot ----------
 
     @FXML protected void onNumber(ActionEvent event) {
-        appendText(((Button) event.getSource()).getText());
+        appendDigit(((Button) event.getSource()).getText());
+    }
+
+    /** Plain digit entry — always concatenates, never triggers implicit multiplication. */
+    private void appendDigit(String digit) {
+        if (justCalculated) {
+            expression.setLength(0);
+            justCalculated = false;
+        }
+        expression.append(digit);
+        updateDisplay();
     }
 
     @FXML protected void onDot() {
@@ -610,7 +692,7 @@ public class HelloController {
         String text = event.getText();
         if (text == null || text.isEmpty()) return;
         char c = text.charAt(0);
-        if (Character.isDigit(c)) { appendText(String.valueOf(c)); return; }
+        if (Character.isDigit(c)) { appendDigit(String.valueOf(c)); return; }
         switch (c) {
             case '.' -> onDot();
             case '+' -> appendOperatorChar('+');

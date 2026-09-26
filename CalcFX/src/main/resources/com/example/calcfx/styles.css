@@ -199,3 +199,19 @@
     -fx-border-color: #313244;
     -fx-border-radius: 8;
 }
+.mode-btn {
+    -fx-background-color: #313244;
+    -fx-text-fill: #a6adc8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 8;
+}
+.mode-btn:hover { -fx-background-color: #45475a; }
+
+.mode-btn-active {
+    -fx-background-color: #89b4fa;
+    -fx-text-fill: #1e1e2e;
+}
+.mode-btn-active:hover { -fx-background-color: #a6c8fc; }
