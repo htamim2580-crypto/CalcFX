@@ -154,3 +154,48 @@
     -fx-padding: 6 12 6 12;
 }
 .clear-history-btn:hover { -fx-background-color: #f5a0b5; }
+/* --- Graphing --- */
+.root-hbox { -fx-background-color: #1e1e2e; }
+.graph-pane { -fx-background-color: #1e1e2e; }
+
+.function-scroll { -fx-background-color: transparent; -fx-background: transparent; }
+.function-scroll .viewport { -fx-background-color: transparent; }
+
+.function-field {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #6c7086;
+    -fx-font-size: 14px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}
+
+.function-remove-btn {
+    -fx-background-color: #45475a;
+    -fx-text-fill: #f38ba8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-min-width: 28;
+    -fx-min-height: 28;
+}
+.function-remove-btn:hover { -fx-background-color: #585b70; }
+
+.add-function-btn {
+    -fx-background-color: #45475a;
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 8;
+}
+.add-function-btn:hover { -fx-background-color: #585b70; }
+
+.graph-canvas-container {
+    -fx-background-color: #1e1e2e;
+    -fx-background-radius: 8;
+    -fx-border-color: #313244;
+    -fx-border-radius: 8;
+}

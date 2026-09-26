@@ -1,125 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/21"
+<HBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.calcfx.HelloController"
-      styleClass="root-vbox" spacing="4">
-    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+      styleClass="root-hbox" spacing="12">
 
-    <HBox alignment="CENTER_LEFT" spacing="8">
-        <Label fx:id="statusLabel" text="DEG" styleClass="status-label"
-               maxWidth="Infinity" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="historyToggle" text="🕘" onAction="#onToggleHistory" styleClass="toggle-btn"/>
-        <Button fx:id="currencyToggle" text="💱" onAction="#onToggleCurrency" styleClass="toggle-btn"/>
-    </HBox>
+    <VBox fx:id="calculatorColumn" styleClass="root-vbox" spacing="4" prefWidth="400" HBox.hgrow="NEVER">
+        <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
 
-    <Label fx:id="expressionLabel" text="" styleClass="expression-label"
-           maxWidth="Infinity" alignment="CENTER_RIGHT"/>
-    <Label fx:id="resultLabel" text="0" styleClass="result-label"
-           maxWidth="Infinity" alignment="CENTER_RIGHT"/>
-
-    <GridPane fx:id="calculatorGrid" hgap="6" vgap="6">
-        <columnConstraints>
-            <ColumnConstraints percentWidth="25"/>
-            <ColumnConstraints percentWidth="25"/>
-            <ColumnConstraints percentWidth="25"/>
-            <ColumnConstraints percentWidth="25"/>
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
-            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
-            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
-            <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
-            <RowConstraints minHeight="48"/>
-        </rowConstraints>
-
-        <!-- Row 0: ( ) % ⌫ -->
-        <Button text="(" onAction="#onOpenParen"  styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <Button text=")" onAction="#onCloseParen" styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-        <Button text="\%" onAction="#onPercent"    styleClass="op-btn"    maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-        <Button text="⌫" onAction="#onBackspace"  styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-
-        <!-- Row 1: sin cos tan log -->
-        <Button text="sin" onAction="#onSin" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <Button text="cos" onAction="#onCos" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <Button text="tan" onAction="#onTan" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-        <Button text="log" onAction="#onLog" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-
-        <!-- Row 2: ln √ x² xʸ -->
-        <Button text="ln" onAction="#onLn"     styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-        <Button text="√"  onAction="#onSqrt"   styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        <Button text="x²" onAction="#onSquare" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
-        <Button text="xʸ" onAction="#onPower"  styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
-
-        <!-- Row 3: MC MR M+ M- -->
-        <Button text="MC" onAction="#onMemoryClear"    styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <Button text="MR" onAction="#onMemoryRecall"   styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-        <Button text="M+" onAction="#onMemoryAdd"      styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
-        <Button text="M-" onAction="#onMemorySubtract" styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
-
-        <!-- Row 4: Deg π e C -->
-        <Button fx:id="angleModeButton" text="Deg" onAction="#onToggleAngleMode" styleClass="toggle-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-        <Button text="π" onAction="#onPi"    styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-        <Button text="e" onAction="#onE"     styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
-        <Button text="C" onAction="#onClear" styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
-
-        <!-- Row 5: 7 8 9 ÷ -->
-        <Button text="7" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-        <Button text="8" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-        <Button text="9" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
-        <Button text="÷" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="5"/>
-
-        <!-- Row 6: 4 5 6 × -->
-        <Button text="4" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-        <Button text="5" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-        <Button text="6" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="6"/>
-        <Button text="×" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="6"/>
-
-        <!-- Row 7: 1 2 3 − -->
-        <Button text="1" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
-        <Button text="2" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
-        <Button text="3" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="7"/>
-        <Button text="−" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="7"/>
-
-        <!-- Row 8: 0 . = + -->
-        <Button text="0" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
-        <Button text="." onAction="#onDot"      styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
-        <Button text="=" onAction="#onEquals"   styleClass="eq-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="8"/>
-        <Button text="+" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="8"/>
-    </GridPane>
-
-    <!-- Currency converter panel (hidden until 💱 is pressed) -->
-    <VBox fx:id="currencyPane" spacing="14" visible="false" managed="false" styleClass="currency-pane">
-        <Label text="Currency Converter" styleClass="currency-title" maxWidth="Infinity" alignment="CENTER"/>
-        <TextField fx:id="amountField" promptText="Amount" styleClass="amount-field"/>
-        <HBox spacing="8" alignment="CENTER">
-            <ComboBox fx:id="fromCurrency" promptText="From" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <Button text="⇄" onAction="#onSwapCurrencies" styleClass="paren-btn"/>
-            <ComboBox fx:id="toCurrency" promptText="To" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        </HBox>
-        <Button text="Convert" onAction="#onConvert" styleClass="eq-btn convert-btn" maxWidth="Infinity"/>
-        <Label fx:id="conversionResultLabel" text="" styleClass="conversion-result" maxWidth="Infinity" alignment="CENTER"/>
-        <Label fx:id="rateInfoLabel" text="" styleClass="rate-info" maxWidth="Infinity" alignment="CENTER"/>
-    </VBox>
-
-    <!-- History panel (hidden until 🕘 is pressed) -->
-    <VBox fx:id="historyPane" spacing="10" visible="false" managed="false" styleClass="history-pane" VBox.vgrow="ALWAYS">
         <HBox alignment="CENTER_LEFT" spacing="8">
-            <Label text="History" styleClass="currency-title" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <Button text="Clear" onAction="#onClearHistory" styleClass="clear-history-btn"/>
+            <Label fx:id="statusLabel" text="DEG" styleClass="status-label"
+                   maxWidth="Infinity" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="graphToggle" text="📈" onAction="#onToggleGraph" styleClass="toggle-btn"/>
+            <Button fx:id="historyToggle" text="🕘" onAction="#onToggleHistory" styleClass="toggle-btn"/>
+            <Button fx:id="currencyToggle" text="💱" onAction="#onToggleCurrency" styleClass="toggle-btn"/>
         </HBox>
-        <ListView fx:id="historyListView" styleClass="history-list" VBox.vgrow="ALWAYS"/>
+
+        <Label fx:id="expressionLabel" text="" styleClass="expression-label"
+               maxWidth="Infinity" alignment="CENTER_RIGHT"/>
+        <Label fx:id="resultLabel" text="0" styleClass="result-label"
+               maxWidth="Infinity" alignment="CENTER_RIGHT"/>
+
+        <GridPane fx:id="calculatorGrid" hgap="6" vgap="6">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="25"/>
+                <ColumnConstraints percentWidth="25"/>
+                <ColumnConstraints percentWidth="25"/>
+                <ColumnConstraints percentWidth="25"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+                <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+                <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+                <RowConstraints minHeight="48"/><RowConstraints minHeight="48"/>
+                <RowConstraints minHeight="48"/>
+            </rowConstraints>
+
+            <!-- Row 0: ( ) % ⌫ -->
+            <Button text="(" onAction="#onOpenParen"  styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <Button text=")" onAction="#onCloseParen" styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <Button text="\%" onAction="#onPercent"   styleClass="op-btn"    maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            <Button text="⌫" onAction="#onBackspace"  styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+            <!-- Row 1: sin cos tan log -->
+            <Button text="sin" onAction="#onSin" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <Button text="cos" onAction="#onCos" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <Button text="tan" onAction="#onTan" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+            <Button text="log" onAction="#onLog" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+            <!-- Row 2: ln √ x² xʸ -->
+            <Button text="ln" onAction="#onLn"     styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Button text="√"  onAction="#onSqrt"   styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <Button text="x²" onAction="#onSquare" styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+            <Button text="xʸ" onAction="#onPower"  styleClass="sci-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+
+            <!-- Row 3: MC MR M+ M- -->
+            <Button text="MC" onAction="#onMemoryClear"    styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <Button text="MR" onAction="#onMemoryRecall"   styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            <Button text="M+" onAction="#onMemoryAdd"      styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+            <Button text="M-" onAction="#onMemorySubtract" styleClass="mem-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+
+            <!-- Row 4: Deg π e C -->
+            <Button fx:id="angleModeButton" text="Deg" onAction="#onToggleAngleMode" styleClass="toggle-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <Button text="π" onAction="#onPi"    styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+            <Button text="e" onAction="#onE"     styleClass="sci-btn"   maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+            <Button text="C" onAction="#onClear" styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
+
+            <!-- Row 5: 7 8 9 ÷ -->
+            <Button text="7" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+            <Button text="8" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+            <Button text="9" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+            <Button text="÷" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="5"/>
+
+            <!-- Row 6: 4 5 6 × -->
+            <Button text="4" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+            <Button text="5" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+            <Button text="6" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="6"/>
+            <Button text="×" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="6"/>
+
+            <!-- Row 7: 1 2 3 − -->
+            <Button text="1" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+            <Button text="2" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+            <Button text="3" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="7"/>
+            <Button text="−" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="7"/>
+
+            <!-- Row 8: 0 . = + -->
+            <Button text="0" onAction="#onNumber"   styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+            <Button text="." onAction="#onDot"      styleClass="num-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+            <Button text="=" onAction="#onEquals"   styleClass="eq-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="8"/>
+            <Button text="+" onAction="#onOperator" styleClass="op-btn"  maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="8"/>
+        </GridPane>
+
+        <!-- Currency converter panel (hidden until 💱 is pressed) -->
+        <VBox fx:id="currencyPane" spacing="14" visible="false" managed="false" styleClass="currency-pane">
+            <Label text="Currency Converter" styleClass="currency-title" maxWidth="Infinity" alignment="CENTER"/>
+            <TextField fx:id="amountField" promptText="Amount" styleClass="amount-field"/>
+            <HBox spacing="8" alignment="CENTER">
+                <ComboBox fx:id="fromCurrency" promptText="From" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button text="⇄" onAction="#onSwapCurrencies" styleClass="paren-btn"/>
+                <ComboBox fx:id="toCurrency" promptText="To" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <Button text="Convert" onAction="#onConvert" styleClass="eq-btn convert-btn" maxWidth="Infinity"/>
+            <Label fx:id="conversionResultLabel" text="" styleClass="conversion-result" maxWidth="Infinity" alignment="CENTER"/>
+            <Label fx:id="rateInfoLabel" text="" styleClass="rate-info" maxWidth="Infinity" alignment="CENTER"/>
+        </VBox>
+
+        <!-- History panel (hidden until 🕘 is pressed) -->
+        <VBox fx:id="historyPane" spacing="10" visible="false" managed="false" styleClass="history-pane" VBox.vgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label text="History" styleClass="currency-title" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button text="Clear" onAction="#onClearHistory" styleClass="clear-history-btn"/>
+            </HBox>
+            <ListView fx:id="historyListView" styleClass="history-list" VBox.vgrow="ALWAYS"/>
+        </VBox>
     </VBox>
-</VBox>
+
+    <!-- Graph panel (hidden until 📈 is pressed) — appears beside the calculator -->
+    <VBox fx:id="graphPane" spacing="10" visible="false" managed="false" styleClass="graph-pane" minWidth="380" HBox.hgrow="ALWAYS">
+        <padding><Insets top="12" right="12" bottom="12" left="0"/></padding>
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <Label text="Graphing" styleClass="currency-title" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Reset View" onAction="#onResetGraphView" styleClass="clear-history-btn"/>
+        </HBox>
+
+        <ScrollPane fitToWidth="true" prefHeight="140" styleClass="function-scroll">
+            <VBox fx:id="functionListBox" spacing="6"/>
+        </ScrollPane>
+        <Button fx:id="addFunctionButton" text="+ Add Function" onAction="#onAddFunction" styleClass="add-function-btn" maxWidth="Infinity"/>
+
+        <Pane fx:id="graphCanvasContainer" styleClass="graph-canvas-container" VBox.vgrow="ALWAYS">
+            <Canvas fx:id="graphCanvas"/>
+        </Pane>
+    </VBox>
+</HBox>
