@@ -3,24 +3,28 @@ package com.example.calcfx;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;   // NEW
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;  // NEW
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;    // NEW
-import javafx.scene.layout.VBox;        // NEW
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
-import java.util.Map;                   // NEW
+import java.util.Map;
 
 public class HelloController {
+
+    private enum ViewMode { CALCULATOR, CURRENCY, HISTORY }
 
     @FXML private Label statusLabel;
     @FXML private Label expressionLabel;
     @FXML private Label resultLabel;
     @FXML private Button angleModeButton;
 
-    // NEW: currency converter controls
+    // Currency converter controls
     @FXML private Button currencyToggle;
     @FXML private GridPane calculatorGrid;
     @FXML private VBox currencyPane;
@@ -30,49 +34,71 @@ public class HelloController {
     @FXML private Label conversionResultLabel;
     @FXML private Label rateInfoLabel;
 
+    // History controls
+    @FXML private Button historyToggle;
+    @FXML private VBox historyPane;
+    @FXML private ListView<DatabaseManager.HistoryEntry> historyListView;
+
     private StringBuilder expression = new StringBuilder();
     private boolean justCalculated = false;
     private int openParens = 0;
     private double memory = 0;
     private CalculatorEngine.AngleMode angleMode = CalculatorEngine.AngleMode.DEGREES;
 
-    // NEW
     private final CurrencyService currencyService = new CurrencyService();
     private Map<String, Double> rates;
-    private boolean currencyMode = false;
+
+    private final DatabaseManager db = DatabaseManager.getInstance();
+    private ViewMode currentView = ViewMode.CALCULATOR;
 
     @FXML
     public void initialize() {
         updateStatus();
-        // Attach keyboard support once the scene is available
         resultLabel.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) newScene.setOnKeyPressed(this::handleKeyPress);
         });
 
-        // NEW: digits-only input for the amount field, and live conversion
         amountField.textProperty().addListener((obs, old, text) -> {
             if (!text.matches("\\d*(\\.\\d*)?")) {
                 amountField.setText(old);
             } else {
-                onConvert();
+                performConversion(false);
             }
         });
-        fromCurrency.valueProperty().addListener((obs, o, n) -> onConvert());
-        toCurrency.valueProperty().addListener((obs, o, n) -> onConvert());
+        fromCurrency.valueProperty().addListener((obs, o, n) -> performConversion(false));
+        toCurrency.valueProperty().addListener((obs, o, n) -> performConversion(false));
+
+        setupHistoryList();
     }
 
-    // ---------- NEW: currency converter ----------
+    // ---------- View switching ----------
 
-    @FXML
-    protected void onToggleCurrency() {
-        currencyMode = !currencyMode;
-        currencyPane.setVisible(currencyMode);
-        currencyPane.setManaged(currencyMode);
-        calculatorGrid.setVisible(!currencyMode);
-        calculatorGrid.setManaged(!currencyMode);
-        currencyToggle.setText(currencyMode ? "🔢" : "💱");
-        if (currencyMode && rates == null) loadRates();
+    @FXML protected void onToggleCurrency() { setView(ViewMode.CURRENCY); }
+
+    @FXML protected void onToggleHistory() { setView(ViewMode.HISTORY); }
+
+    private void setView(ViewMode requested) {
+        currentView = (currentView == requested) ? ViewMode.CALCULATOR : requested;
+
+        boolean calc = currentView == ViewMode.CALCULATOR;
+        boolean curr = currentView == ViewMode.CURRENCY;
+        boolean hist = currentView == ViewMode.HISTORY;
+
+        calculatorGrid.setVisible(calc);
+        calculatorGrid.setManaged(calc);
+        currencyPane.setVisible(curr);
+        currencyPane.setManaged(curr);
+        historyPane.setVisible(hist);
+        historyPane.setManaged(hist);
+
+        currencyToggle.setText(curr ? "🔢" : "💱");
+        historyToggle.setText(hist ? "🔢" : "🕘");
+
+        if (curr && rates == null) loadRates();
+        if (hist) refreshHistory();
     }
+
+    // ---------- Currency converter ----------
 
     private void loadRates() {
         conversionResultLabel.setText("Loading rates…");
@@ -89,15 +115,18 @@ public class HelloController {
         });
     }
 
-    @FXML
-    protected void onSwapCurrencies() {
+    @FXML protected void onSwapCurrencies() {
         String from = fromCurrency.getValue();
         fromCurrency.setValue(toCurrency.getValue());
         toCurrency.setValue(from);
     }
 
-    @FXML
-    protected void onConvert() {
+    /** Bound to the "Convert" button — this is the only call that saves to history. */
+    @FXML protected void onConvert() {
+        performConversion(true);
+    }
+
+    private void performConversion(boolean saveToHistory) {
         if (rates == null) return;
         String text = amountField.getText().trim();
         if (text.isEmpty() || text.equals(".")) {
@@ -109,14 +138,62 @@ public class HelloController {
         String to = toCurrency.getValue();
         if (from == null || to == null) return;
 
-        double amount = Double.parseDouble(text); // field only allows valid numbers
-        // Rates are USD-based: convert FROM -> USD -> TO
+        double amount = Double.parseDouble(text);
         double result = amount / rates.get(from) * rates.get(to);
-        conversionResultLabel.setText(formatResult(amount) + " " + from + " = " + formatResult(result) + " " + to);
+        String amountStr = formatResult(amount);
+        String resultStr = formatResult(result);
+
+        conversionResultLabel.setText(amountStr + " " + from + " = " + resultStr + " " + to);
         rateInfoLabel.setText("1 " + from + " = " + formatResult(rates.get(to) / rates.get(from)) + " " + to);
+
+        if (saveToHistory) {
+            db.saveConversion(amountStr + " " + from + " → " + to, resultStr + " " + to);
+        }
+    }
+
+    // ---------- History panel ----------
+
+    private void setupHistoryList() {
+        historyListView.setPlaceholder(new Label("No history yet"));
+        historyListView.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(DatabaseManager.HistoryEntry entry, boolean empty) {
+                super.updateItem(entry, empty);
+                if (empty || entry == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    String icon = entry.type().equals("CONVERT") ? "💱" : "🧮";
+                    setText(icon + "  " + entry.expression() + "  =  " + entry.result()
+                            + "\n" + entry.timestamp());
+                }
+            }
+        });
+        // Double-click a calculation to load its result back into the calculator
+        historyListView.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+                DatabaseManager.HistoryEntry selected = historyListView.getSelectionModel().getSelectedItem();
+                if (selected != null && selected.type().equals("CALC")) {
+                    setView(ViewMode.CALCULATOR);
+                    expression = new StringBuilder(selected.result());
+                    justCalculated = true;
+                    updateDisplay();
+                }
+            }
+        });
+    }
+
+    private void refreshHistory() {
+        historyListView.getItems().setAll(db.getRecentHistory(100));
+    }
+
+    @FXML protected void onClearHistory() {
+        db.clearHistory();
+        refreshHistory();
     }
 
     // ---------- Digits / dot ----------
+
     @FXML protected void onNumber(ActionEvent event) {
         appendText(((Button) event.getSource()).getText());
     }
@@ -140,6 +217,7 @@ public class HelloController {
     }
 
     // ---------- Operators ----------
+
     @FXML protected void onOperator(ActionEvent event) {
         appendOperatorChar(((Button) event.getSource()).getText().charAt(0));
     }
@@ -174,6 +252,7 @@ public class HelloController {
     }
 
     // ---------- Parentheses ----------
+
     @FXML protected void onOpenParen() {
         if (justCalculated) { expression.setLength(0); justCalculated = false; }
         maybeInsertImplicitMultiply("(");
@@ -193,6 +272,7 @@ public class HelloController {
     }
 
     // ---------- Functions ----------
+
     @FXML protected void onSin()  { appendFunction("sin"); }
     @FXML protected void onCos()  { appendFunction("cos"); }
     @FXML protected void onTan()  { appendFunction("tan"); }
@@ -217,6 +297,7 @@ public class HelloController {
     }
 
     // ---------- Constants ----------
+
     @FXML protected void onPi() { appendConstant("π"); }
     @FXML protected void onE()  { appendConstant("e"); }
 
@@ -228,6 +309,7 @@ public class HelloController {
     }
 
     // ---------- Clear / backspace ----------
+
     @FXML protected void onClear() {
         expression.setLength(0);
         openParens = 0;
@@ -246,16 +328,19 @@ public class HelloController {
     }
 
     // ---------- Equals ----------
+
     @FXML protected void onEquals(ActionEvent event) {
         if (expression.length() == 0) return;
+        String original = expression.toString();
         try {
-            double result = CalculatorEngine.evaluate(expression.toString(), angleMode);
+            double result = CalculatorEngine.evaluate(original, angleMode);
             String formatted = formatResult(result);
-            expressionLabel.setText(expression + " =");
+            expressionLabel.setText(original + " =");
             resultLabel.setText(formatted);
             expression = new StringBuilder(formatted);
             openParens = 0;
             justCalculated = true;
+            db.saveCalculation(original, formatted);
         } catch (Exception e) {
             resultLabel.setText("Error");
             expression.setLength(0);
@@ -265,6 +350,7 @@ public class HelloController {
     }
 
     // ---------- Memory ----------
+
     @FXML protected void onMemoryClear() { memory = 0; updateStatus(); }
 
     @FXML protected void onMemoryRecall() { appendText(formatResult(memory)); }
@@ -280,6 +366,7 @@ public class HelloController {
     }
 
     // ---------- Deg/Rad ----------
+
     @FXML protected void onToggleAngleMode() {
         angleMode = (angleMode == CalculatorEngine.AngleMode.DEGREES)
                 ? CalculatorEngine.AngleMode.RADIANS
@@ -294,8 +381,9 @@ public class HelloController {
     }
 
     // ---------- Keyboard ----------
+
     private void handleKeyPress(KeyEvent event) {
-        if (currencyMode) return; // NEW: don't hijack typing in the converter
+        if (currentView != ViewMode.CALCULATOR) return;
         KeyCode code = event.getCode();
         if (code == KeyCode.ENTER)      { onEquals(null); return; }
         if (code == KeyCode.BACK_SPACE) { onBackspace();  return; }
@@ -320,6 +408,7 @@ public class HelloController {
     }
 
     // ---------- Shared helpers ----------
+
     private void appendText(String text) {
         if (justCalculated) {
             boolean startsNewNumber = Character.isDigit(text.charAt(0)) || text.equals(".") || text.charAt(0) == '-';

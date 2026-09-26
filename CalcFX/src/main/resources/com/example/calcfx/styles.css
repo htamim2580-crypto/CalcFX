@@ -122,3 +122,35 @@
 .convert-btn { -fx-padding: 12; }
 .conversion-result { -fx-text-fill: #a6e3a1; -fx-font-size: 22px; -fx-font-weight: bold; -fx-min-height: 30px; }
 .rate-info { -fx-text-fill: #6c7086; -fx-font-size: 12px; }
+/* --- History panel --- */
+.history-pane { -fx-padding: 12 4 0 4; }
+.history-list {
+    -fx-background-color: #313244;
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+}
+.history-list .list-cell {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 13px;
+    -fx-padding: 10 8 10 8;
+}
+.history-list .list-cell:filled:hover {
+    -fx-background-color: #45475a;
+}
+.history-list .list-cell:filled:selected {
+    -fx-background-color: #585b70;
+}
+.history-list .placeholder .label {
+    -fx-text-fill: #6c7086;
+}
+.clear-history-btn {
+    -fx-background-color: #f38ba8;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 6 12 6 12;
+}
+.clear-history-btn:hover { -fx-background-color: #f5a0b5; }

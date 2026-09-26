@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -20,6 +21,7 @@
     <HBox alignment="CENTER_LEFT" spacing="8">
         <Label fx:id="statusLabel" text="DEG" styleClass="status-label"
                maxWidth="Infinity" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="historyToggle" text="🕘" onAction="#onToggleHistory" styleClass="toggle-btn"/>
         <Button fx:id="currencyToggle" text="💱" onAction="#onToggleCurrency" styleClass="toggle-btn"/>
     </HBox>
 
@@ -46,7 +48,7 @@
         <!-- Row 0: ( ) % ⌫ -->
         <Button text="(" onAction="#onOpenParen"  styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
         <Button text=")" onAction="#onCloseParen" styleClass="paren-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-        <Button text="\%" onAction="#onPercent"   styleClass="op-btn"    maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+        <Button text="\%" onAction="#onPercent"    styleClass="op-btn"    maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
         <Button text="⌫" onAction="#onBackspace"  styleClass="clear-btn" maxWidth="Infinity" maxHeight="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
         <!-- Row 1: sin cos tan log -->
@@ -110,5 +112,14 @@
         <Button text="Convert" onAction="#onConvert" styleClass="eq-btn convert-btn" maxWidth="Infinity"/>
         <Label fx:id="conversionResultLabel" text="" styleClass="conversion-result" maxWidth="Infinity" alignment="CENTER"/>
         <Label fx:id="rateInfoLabel" text="" styleClass="rate-info" maxWidth="Infinity" alignment="CENTER"/>
+    </VBox>
+
+    <!-- History panel (hidden until 🕘 is pressed) -->
+    <VBox fx:id="historyPane" spacing="10" visible="false" managed="false" styleClass="history-pane" VBox.vgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <Label text="History" styleClass="currency-title" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Clear" onAction="#onClearHistory" styleClass="clear-history-btn"/>
+        </HBox>
+        <ListView fx:id="historyListView" styleClass="history-list" VBox.vgrow="ALWAYS"/>
     </VBox>
 </VBox>
