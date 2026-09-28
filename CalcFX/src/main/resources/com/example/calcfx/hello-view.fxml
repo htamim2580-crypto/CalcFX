@@ -30,6 +30,7 @@
             <Button fx:id="graphToggle" text="📈" onAction="#onToggleGraph" styleClass="toggle-btn"/>
             <Button fx:id="historyToggle" text="🕘" onAction="#onToggleHistory" styleClass="toggle-btn"/>
             <Button fx:id="currencyToggle" text="💱" onAction="#onToggleCurrency" styleClass="toggle-btn"/>
+            <Button fx:id="matrixToggle" text="▦" onAction="#onToggleMatrix" styleClass="toggle-btn"/>
         </HBox>
 
         <Label fx:id="expressionLabel" text="" styleClass="expression-label"
@@ -153,6 +154,61 @@
 
             <Button text="Calculate" onAction="#onCalculateCalculus" styleClass="eq-btn convert-btn" maxWidth="Infinity"/>
             <Label fx:id="calcResultLabel" text="" styleClass="conversion-result" maxWidth="Infinity" alignment="CENTER" wrapText="true"/>
+        </VBox>
+        <!-- Matrix panel (hidden until ▦ is pressed) -->
+        <VBox fx:id="matrixPane" spacing="8" visible="false" managed="false" styleClass="currency-pane">
+            <Label text="Matrix Operations" styleClass="currency-title" maxWidth="Infinity" alignment="CENTER"/>
+
+            <HBox spacing="12" alignment="TOP_CENTER">
+                <VBox spacing="6" alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                    <Label text="Matrix A" styleClass="matrix-label"/>
+                    <HBox spacing="4" alignment="CENTER">
+                        <ComboBox fx:id="rowsA" prefWidth="64"/>
+                        <Label text="×" styleClass="matrix-label"/>
+                        <ComboBox fx:id="colsA" prefWidth="64"/>
+                    </HBox>
+                    <GridPane fx:id="gridA" hgap="3" vgap="3" alignment="CENTER"/>
+                </VBox>
+
+                <VBox spacing="6" alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                    <Label text="Matrix B" styleClass="matrix-label"/>
+                    <HBox spacing="4" alignment="CENTER">
+                        <ComboBox fx:id="rowsB" prefWidth="64"/>
+                        <Label text="×" styleClass="matrix-label"/>
+                        <ComboBox fx:id="colsB" prefWidth="64"/>
+                    </HBox>
+                    <GridPane fx:id="gridB" hgap="3" vgap="3" alignment="CENTER"/>
+                </VBox>
+            </HBox>
+
+            <TextField fx:id="scalarField" promptText="scalar k (used by k·A)" styleClass="amount-field"/>
+
+            <GridPane hgap="6" vgap="6">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="25"/>
+                    <ColumnConstraints percentWidth="25"/>
+                    <ColumnConstraints percentWidth="25"/>
+                    <ColumnConstraints percentWidth="25"/>
+                </columnConstraints>
+
+                <Button text="A+B" userData="add"       onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Button text="A−B" userData="sub"       onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Button text="A×B" userData="mul"       onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <Button text="k·A" userData="scale"     onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <Button text="Aᵀ"    userData="transpose" onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Button text="det A" userData="det"       onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Button text="A⁻¹"   userData="inv"       onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                <Button text="tr A"  userData="trace"     onAction="#onMatrixOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                <Button text="RREF"  userData="rref"  onAction="#onMatrixOp" styleClass="sci-btn"   maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Button text="rank"  userData="rank"  onAction="#onMatrixOp" styleClass="sci-btn"   maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Button text="Ax=b"  userData="solve" onAction="#onMatrixOp" styleClass="sci-btn"   maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <Button text="Clear" userData="clear" onAction="#onMatrixOp" styleClass="clear-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+            </GridPane>
+
+            <Label text="Ax = b uses the first column of B as b" styleClass="rate-info" maxWidth="Infinity" alignment="CENTER"/>
+            <Label fx:id="matrixResultLabel" text="" styleClass="matrix-result" maxWidth="Infinity" alignment="CENTER"/>
         </VBox>
     </VBox>
 

@@ -36,8 +36,18 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class HelloController {
 
-    private enum ViewMode { CALCULATOR, CURRENCY, HISTORY, GRAPH, CALCULUS }
 
+    private enum ViewMode { CALCULATOR, CURRENCY, HISTORY, GRAPH, CALCULUS, MATRIX }
+    // Matrix controls
+    @FXML private Button matrixToggle;
+    @FXML private VBox matrixPane;
+    @FXML private ComboBox<Integer> rowsA, colsA, rowsB, colsB;
+    @FXML private GridPane gridA, gridB;
+    @FXML private TextField scalarField;
+    @FXML private Label matrixResultLabel;
+
+    private final TextField[][] cellsA = new TextField[4][4];
+    private final TextField[][] cellsB = new TextField[4][4];
     @FXML private Label statusLabel;
     @FXML private Label expressionLabel;
     @FXML private Label resultLabel;
@@ -142,6 +152,7 @@ public class HelloController {
 
         setupHistoryList();
         setupGraph();
+        setupMatrixPanel();
         updateCalcModeUI();
     }
 
@@ -207,6 +218,7 @@ public class HelloController {
         boolean hist = currentView == ViewMode.HISTORY;
         boolean graph = currentView == ViewMode.GRAPH;
         boolean calculus = currentView == ViewMode.CALCULUS;
+        boolean matrix = currentView == ViewMode.MATRIX;
 
         calculatorGrid.setVisible(calc);
         calculatorGrid.setManaged(calc);
@@ -218,11 +230,14 @@ public class HelloController {
         graphPane.setManaged(graph);
         calculusPane.setVisible(calculus);
         calculusPane.setManaged(calculus);
+        matrixPane.setVisible(matrix);
+        matrixPane.setManaged(matrix);
 
         currencyToggle.setText(curr ? "🔢" : "💱");
         historyToggle.setText(hist ? "🔢" : "🕘");
         graphToggle.setText(graph ? "🔢" : "📈");
         calculusToggle.setText(calculus ? "🔢" : "∂");
+        matrixToggle.setText(matrix ? "🔢" : "▦");
 
         resizeWindowForGraphView(previous, currentView);
 
@@ -307,7 +322,11 @@ public class HelloController {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    String icon = entry.type().equals("CONVERT") ? "💱" : "🧮";
+                    String icon = switch (entry.type()) {
+                        case "CONVERT" -> "💱";
+                        case "MATRIX" -> "▦";
+                        default -> "🧮";
+                    };
                     setText(icon + "  " + entry.expression() + "  =  " + entry.result()
                             + "\n" + entry.timestamp());
                 }
@@ -505,6 +524,143 @@ public class HelloController {
         return Math.max(50, Math.min(160, v));
     }
 
+    // ---------- Matrix operations ----------
+
+    @FXML protected void onToggleMatrix() { setView(ViewMode.MATRIX); }
+
+    private void setupMatrixPanel() {
+        buildMatrixGrid(gridA, cellsA);
+        buildMatrixGrid(gridB, cellsB);
+
+        List<ComboBox<Integer>> selectors = List.of(rowsA, colsA, rowsB, colsB);
+        for (ComboBox<Integer> cb : selectors) {
+            cb.getItems().addAll(1, 2, 3, 4);
+            cb.setValue(2);
+        }
+        // Listeners are added after the initial values are set so they never see a null.
+        for (ComboBox<Integer> cb : selectors) {
+            cb.valueProperty().addListener((obs, o, n) -> updateMatrixVisibility());
+        }
+        updateMatrixVisibility();
+    }
+
+    /** All 16 cells exist up front; resizing only shows/hides them, so typed values are kept. */
+    private void buildMatrixGrid(GridPane grid, TextField[][] cells) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                TextField tf = new TextField();
+                tf.getStyleClass().add("matrix-cell");
+                tf.setPrefWidth(40);
+                tf.setPromptText("0");
+                tf.setAlignment(Pos.CENTER);
+                cells[i][j] = tf;
+                grid.add(tf, j, i);
+            }
+        }
+    }
+
+    private void updateMatrixVisibility() {
+        applyMatrixSize(cellsA, rowsA.getValue(), colsA.getValue());
+        applyMatrixSize(cellsB, rowsB.getValue(), colsB.getValue());
+    }
+
+    private void applyMatrixSize(TextField[][] cells, int r, int c) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                boolean show = i < r && j < c;
+                cells[i][j].setVisible(show);
+                cells[i][j].setManaged(show);
+            }
+        }
+    }
+
+    private Matrix readMatrix(TextField[][] cells, int r, int c, String name) {
+        double[][] d = new double[r][c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                String t = cells[i][j].getText().trim();
+                if (t.isEmpty()) continue; // empty cell counts as 0
+                try {
+                    double v = Double.parseDouble(t);
+                    if (!Double.isFinite(v)) throw new NumberFormatException();
+                    d[i][j] = v;
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Invalid number in matrix " + name);
+                }
+            }
+        }
+        return new Matrix(d);
+    }
+
+    private double readScalar() {
+        String t = scalarField.getText().trim();
+        if (t.isEmpty()) throw new IllegalArgumentException("Enter a scalar k first");
+        try {
+            double k = Double.parseDouble(t);
+            if (!Double.isFinite(k)) throw new NumberFormatException();
+            return k;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid scalar k");
+        }
+    }
+
+    @FXML protected void onMatrixOp(ActionEvent event) {
+        String op = String.valueOf(((Button) event.getSource()).getUserData());
+
+        if (op.equals("clear")) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    cellsA[i][j].clear();
+                    cellsB[i][j].clear();
+                }
+            }
+            scalarField.clear();
+            matrixResultLabel.setText("");
+            return;
+        }
+
+        try {
+            Matrix a = readMatrix(cellsA, rowsA.getValue(), colsA.getValue(), "A");
+            boolean needsB = op.equals("add") || op.equals("sub") || op.equals("mul") || op.equals("solve");
+            Matrix b = needsB ? readMatrix(cellsB, rowsB.getValue(), colsB.getValue(), "B") : null;
+
+            switch (op) {
+                case "add" -> showMatrixResult("A + B", a.toInline() + " + " + b.toInline(), a.add(b));
+                case "sub" -> showMatrixResult("A − B", a.toInline() + " − " + b.toInline(), a.subtract(b));
+                case "mul" -> showMatrixResult("A × B", a.toInline() + " × " + b.toInline(), a.multiply(b));
+                case "scale" -> {
+                    double k = readScalar();
+                    showMatrixResult("k·A  (k = " + Matrix.format(k) + ")",
+                            Matrix.format(k) + " · " + a.toInline(), a.scale(k));
+                }
+                case "transpose" -> showMatrixResult("Aᵀ", "transpose(" + a.toInline() + ")", a.transpose());
+                case "det" -> showScalarResult("det(A)", "det(" + a.toInline() + ")", a.determinant());
+                case "inv" -> showMatrixResult("A⁻¹", "inverse(" + a.toInline() + ")", a.inverse());
+                case "trace" -> showScalarResult("tr(A)", "trace(" + a.toInline() + ")", a.trace());
+                case "rref" -> showMatrixResult("RREF(A)", "rref(" + a.toInline() + ")", a.rref());
+                case "rank" -> showScalarResult("rank(A)", "rank(" + a.toInline() + ")", a.rank());
+                case "solve" -> {
+                    Matrix bVec = b.column(0);
+                    showMatrixResult("x  (solving Ax = b)",
+                            "solve(" + a.toInline() + ", b=" + bVec.toInline() + ")", a.solve(bVec));
+                }
+                default -> {}
+            }
+        } catch (IllegalArgumentException | ArithmeticException ex) {
+            matrixResultLabel.setText(ex.getMessage());
+        }
+    }
+
+    private void showMatrixResult(String label, String historyExpr, Matrix result) {
+        matrixResultLabel.setText(label + " =\n" + result);
+        db.saveMatrix(historyExpr, result.toInline());
+    }
+
+    private void showScalarResult(String label, String historyExpr, double value) {
+        String formatted = Matrix.format(value);
+        matrixResultLabel.setText(label + " = " + formatted);
+        db.saveMatrix(historyExpr, formatted);
+    }
     // ---------- Digits / dot ----------
 
     @FXML protected void onNumber(ActionEvent event) {

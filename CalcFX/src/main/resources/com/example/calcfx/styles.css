@@ -225,3 +225,25 @@
     -fx-padding: 6 12 6 12;
 }
 .edit-history-btn:hover { -fx-background-color: #a6c8fc; }
+/* --- Matrix panel --- */
+.matrix-label {
+    -fx-text-fill: #a6adc8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.matrix-cell {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #585b70;
+    -fx-font-size: 13px;
+    -fx-background-radius: 6;
+    -fx-padding: 4 2 4 2;
+}
+
+.matrix-result {
+    -fx-text-fill: #a6e3a1;
+    -fx-font-family: "Consolas", "Monospaced";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
