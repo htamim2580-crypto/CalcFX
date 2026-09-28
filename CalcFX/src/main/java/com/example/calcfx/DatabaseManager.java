@@ -72,6 +72,10 @@ public class DatabaseManager {
     public void saveMatrix(String expression, String result) {
         save("MATRIX", expression, result);
     }
+    /** Saves a completed complex-number operation. */
+    public void saveComplex(String expression, String result) {
+        save("COMPLEX", expression, result);
+    }
 
     private void save(String type, String expression, String result) {
         String sql = "INSERT INTO history (type, expression, result, timestamp) VALUES (?, ?, ?, ?)";

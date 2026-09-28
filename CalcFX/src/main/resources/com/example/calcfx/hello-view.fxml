@@ -31,6 +31,7 @@
             <Button fx:id="historyToggle" text="🕘" onAction="#onToggleHistory" styleClass="toggle-btn"/>
             <Button fx:id="currencyToggle" text="💱" onAction="#onToggleCurrency" styleClass="toggle-btn"/>
             <Button fx:id="matrixToggle" text="▦" onAction="#onToggleMatrix" styleClass="toggle-btn"/>
+            <Button fx:id="complexToggle" text="ℂ" onAction="#onToggleComplex" styleClass="toggle-btn"/>
         </HBox>
 
         <Label fx:id="expressionLabel" text="" styleClass="expression-label"
@@ -178,6 +179,55 @@
                         <ComboBox fx:id="colsB" prefWidth="64"/>
                     </HBox>
                     <GridPane fx:id="gridB" hgap="3" vgap="3" alignment="CENTER"/>
+                </VBox>
+                <!-- Complex number panel (hidden until ℂ is pressed) -->
+                <VBox fx:id="complexPane" spacing="10" visible="false" managed="false" styleClass="currency-pane">
+                    <Label text="Complex Numbers" styleClass="currency-title" maxWidth="Infinity" alignment="CENTER"/>
+
+                    <HBox spacing="6" alignment="CENTER_LEFT">
+                        <Label text="z₁ =" styleClass="matrix-label" minWidth="34"/>
+                        <TextField fx:id="z1Re" promptText="real" styleClass="amount-field" minWidth="0" prefWidth="80" HBox.hgrow="ALWAYS"/>
+                        <Label text="+" styleClass="matrix-label"/>
+                        <TextField fx:id="z1Im" promptText="imag" styleClass="amount-field" minWidth="0" prefWidth="80" HBox.hgrow="ALWAYS"/>
+                        <Label text="i" styleClass="matrix-label"/>
+                    </HBox>
+
+                    <HBox spacing="6" alignment="CENTER_LEFT">
+                        <Label text="z₂ =" styleClass="matrix-label" minWidth="34"/>
+                        <TextField fx:id="z2Re" promptText="real" styleClass="amount-field" minWidth="0" prefWidth="80" HBox.hgrow="ALWAYS"/>
+                        <Label text="+" styleClass="matrix-label"/>
+                        <TextField fx:id="z2Im" promptText="imag" styleClass="amount-field" minWidth="0" prefWidth="80" HBox.hgrow="ALWAYS"/>
+                        <Label text="i" styleClass="matrix-label"/>
+                    </HBox>
+
+                    <TextField fx:id="complexNField" promptText="n (whole number, for zⁿ and ⁿ√z)" styleClass="amount-field"/>
+
+                    <GridPane hgap="6" vgap="6">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="25"/>
+                            <ColumnConstraints percentWidth="25"/>
+                            <ColumnConstraints percentWidth="25"/>
+                            <ColumnConstraints percentWidth="25"/>
+                        </columnConstraints>
+
+                        <Button text="z₁+z₂" userData="add" onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <Button text="z₁−z₂" userData="sub" onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <Button text="z₁×z₂" userData="mul" onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                        <Button text="z₁÷z₂" userData="div" onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                        <Button text="conj"  userData="conj"  onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <Button text="|z|"   userData="mod"   onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Button text="polar" userData="polar" onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                        <Button text="1/z"   userData="recip" onAction="#onComplexOp" styleClass="sci-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                        <Button text="√z"   userData="sqrt"  onAction="#onComplexOp" styleClass="sci-btn"   maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Button text="zⁿ"   userData="pow"   onAction="#onComplexOp" styleClass="sci-btn"   maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Button text="ⁿ√z"  userData="roots" onAction="#onComplexOp" styleClass="sci-btn"   maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                        <Button text="Clear" userData="clear" onAction="#onComplexOp" styleClass="clear-btn" maxWidth="Infinity" prefHeight="34" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                    </GridPane>
+
+                    <Label text="Unary operations (conj, |z|, polar, 1/z, √z, zⁿ, ⁿ√z) use z₁ only" styleClass="rate-info" maxWidth="Infinity" alignment="CENTER" wrapText="true"/>
+                    <Label fx:id="complexResultLabel" text="" styleClass="matrix-result" maxWidth="Infinity" alignment="CENTER" wrapText="true"/>
                 </VBox>
             </HBox>
 

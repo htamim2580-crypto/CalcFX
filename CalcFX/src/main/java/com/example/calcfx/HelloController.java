@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HelloController {
 
 
-    private enum ViewMode { CALCULATOR, CURRENCY, HISTORY, GRAPH, CALCULUS, MATRIX }
+    private enum ViewMode { CALCULATOR, CURRENCY, HISTORY, GRAPH, CALCULUS, MATRIX, COMPLEX }
     // Matrix controls
     @FXML private Button matrixToggle;
     @FXML private VBox matrixPane;
@@ -46,6 +46,11 @@ public class HelloController {
     @FXML private TextField scalarField;
     @FXML private Label matrixResultLabel;
 
+    // Complex number controls
+    @FXML private Button complexToggle;
+    @FXML private VBox complexPane;
+    @FXML private TextField z1Re, z1Im, z2Re, z2Im, complexNField;
+    @FXML private Label complexResultLabel;
     private final TextField[][] cellsA = new TextField[4][4];
     private final TextField[][] cellsB = new TextField[4][4];
     @FXML private Label statusLabel;
@@ -219,6 +224,7 @@ public class HelloController {
         boolean graph = currentView == ViewMode.GRAPH;
         boolean calculus = currentView == ViewMode.CALCULUS;
         boolean matrix = currentView == ViewMode.MATRIX;
+        boolean complex = currentView == ViewMode.COMPLEX;
 
         calculatorGrid.setVisible(calc);
         calculatorGrid.setManaged(calc);
@@ -232,12 +238,15 @@ public class HelloController {
         calculusPane.setManaged(calculus);
         matrixPane.setVisible(matrix);
         matrixPane.setManaged(matrix);
+        complexPane.setVisible(complex);
+        complexPane.setManaged(complex);
 
         currencyToggle.setText(curr ? "🔢" : "💱");
         historyToggle.setText(hist ? "🔢" : "🕘");
         graphToggle.setText(graph ? "🔢" : "📈");
         calculusToggle.setText(calculus ? "🔢" : "∂");
         matrixToggle.setText(matrix ? "🔢" : "▦");
+        complexToggle.setText(complex ? "🔢" : "ℂ");
 
         resizeWindowForGraphView(previous, currentView);
 
@@ -325,6 +334,7 @@ public class HelloController {
                     String icon = switch (entry.type()) {
                         case "CONVERT" -> "💱";
                         case "MATRIX" -> "▦";
+                        case "COMPLEX" -> "ℂ";
                         default -> "🧮";
                     };
                     setText(icon + "  " + entry.expression() + "  =  " + entry.result()
@@ -660,6 +670,101 @@ public class HelloController {
         String formatted = Matrix.format(value);
         matrixResultLabel.setText(label + " = " + formatted);
         db.saveMatrix(historyExpr, formatted);
+    }
+    // ---------- Complex number operations ----------
+
+    @FXML protected void onToggleComplex() { setView(ViewMode.COMPLEX); }
+
+    private Complex readComplex(TextField reField, TextField imField, String name) {
+        return new Complex(readPart(reField, name), readPart(imField, name));
+    }
+
+    private double readPart(TextField field, String name) {
+        String t = field.getText().trim();
+        if (t.isEmpty()) return 0; // empty counts as 0
+        try {
+            double v = Double.parseDouble(t);
+            if (!Double.isFinite(v)) throw new NumberFormatException();
+            return v;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid number in " + name);
+        }
+    }
+
+    private int readWholeNumber() {
+        String t = complexNField.getText().trim();
+        if (t.isEmpty()) throw new IllegalArgumentException("Enter n first");
+        try {
+            return Integer.parseInt(t);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("n must be a whole number");
+        }
+    }
+
+    @FXML protected void onComplexOp(ActionEvent event) {
+        String op = String.valueOf(((Button) event.getSource()).getUserData());
+
+        if (op.equals("clear")) {
+            z1Re.clear(); z1Im.clear(); z2Re.clear(); z2Im.clear();
+            complexNField.clear();
+            complexResultLabel.setText("");
+            return;
+        }
+
+        try {
+            Complex z1 = readComplex(z1Re, z1Im, "z₁");
+            boolean needsZ2 = op.equals("add") || op.equals("sub") || op.equals("mul") || op.equals("div");
+            Complex z2 = needsZ2 ? readComplex(z2Re, z2Im, "z₂") : null;
+            String a = "(" + z1 + ")";
+            String b = needsZ2 ? "(" + z2 + ")" : "";
+
+            switch (op) {
+                case "add" -> showComplexResult("z₁ + z₂", a + " + " + b, z1.plus(z2));
+                case "sub" -> showComplexResult("z₁ − z₂", a + " - " + b, z1.minus(z2));
+                case "mul" -> showComplexResult("z₁ × z₂", a + " × " + b, z1.times(z2));
+                case "div" -> showComplexResult("z₁ ÷ z₂", a + " ÷ " + b, z1.dividedBy(z2));
+                case "conj" -> showComplexResult("conj(z₁)", "conj" + a, z1.conjugate());
+                case "recip" -> showComplexResult("1 / z₁", "1 / " + a, z1.reciprocal());
+                case "sqrt" -> showComplexResult("√z₁", "sqrt" + a, z1.sqrt());
+                case "mod" -> {
+                    String m = Complex.format(z1.modulus());
+                    complexResultLabel.setText("|z₁| = " + m);
+                    db.saveComplex("|" + z1 + "|", m);
+                }
+                case "polar" -> {
+                    String polar = z1.toPolar();
+                    complexResultLabel.setText("polar(z₁)\n" + polar);
+                    db.saveComplex("polar" + a, polar.replace("\n", ", "));
+                }
+                case "pow" -> {
+                    int n = readWholeNumber();
+                    if (Math.abs(n) > 100) throw new IllegalArgumentException("|n| must be at most 100");
+                    showComplexResult("z₁^" + n, a + "^" + n, z1.pow(n));
+                }
+                case "roots" -> {
+                    int n = readWholeNumber();
+                    if (n < 1 || n > 20) throw new IllegalArgumentException("n must be between 1 and 20");
+                    List<Complex> roots = z1.roots(n);
+                    StringBuilder display = new StringBuilder(n + " roots of z₁:");
+                    StringBuilder inline = new StringBuilder();
+                    for (int k = 0; k < roots.size(); k++) {
+                        display.append("\nk=").append(k).append(":  ").append(roots.get(k));
+                        if (k > 0) inline.append("; ");
+                        inline.append(roots.get(k));
+                    }
+                    complexResultLabel.setText(display.toString());
+                    db.saveComplex("roots(" + a + ", n=" + n + ")", inline.toString());
+                }
+                default -> {}
+            }
+        } catch (IllegalArgumentException | ArithmeticException ex) {
+            complexResultLabel.setText(ex.getMessage());
+        }
+    }
+
+    private void showComplexResult(String label, String historyExpr, Complex result) {
+        complexResultLabel.setText(label + " = " + result);
+        db.saveComplex(historyExpr, result.toString());
     }
     // ---------- Digits / dot ----------
 
