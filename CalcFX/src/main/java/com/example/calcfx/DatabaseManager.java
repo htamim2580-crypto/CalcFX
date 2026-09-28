@@ -7,13 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handles all SQLite storage for CalcFX. Every finished calculation and every
- * currency conversion is saved here so it survives app restarts.
- *
- * The database file lives at ~/.calcfx/history.db so it works the same way
- * whether you run the app from IntelliJ, Maven, or a packaged jar.
- */
+
 public class DatabaseManager {
 
     private static final String DB_FILE_PATH = buildDbPath();
@@ -103,7 +97,7 @@ public class DatabaseManager {
         }
     }
 
-    /** Returns the most recent entries, newest first. */
+    // Returns the most recent entries, newest first.
     public List<HistoryEntry> getRecentHistory(int limit) {
         List<HistoryEntry> list = new ArrayList<>();
         String sql = "SELECT id, type, expression, result, timestamp FROM history ORDER BY id DESC LIMIT ?";

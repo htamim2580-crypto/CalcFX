@@ -12,11 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
-/**
- * Fetches exchange rates from https://open.er-api.com — free, no API key,
- * rates update daily. Response looks like:
- * { "result": "success", "base_code": "USD", "rates": { "USD": 1, "EUR": 0.92, ... } }
- */
+
 public class CurrencyService {
 
     private static final String API_URL = "https://open.er-api.com/v6/latest/USD";
@@ -25,10 +21,7 @@ public class CurrencyService {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    /**
-     * Fetches USD-based rates. The HTTP call runs on a background thread so the
-     * UI never freezes; both callbacks are delivered back on the JavaFX thread.
-     */
+
     public void fetchRates(Consumer<Map<String, Double>> onSuccess, Consumer<String> onError) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_URL))

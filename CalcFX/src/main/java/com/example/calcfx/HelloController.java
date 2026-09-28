@@ -132,8 +132,7 @@ public class HelloController {
         t.setDaemon(true);
         return t;
     });
-    // Every redraw request gets a stamp. If a newer request arrives before an
-    // older one finishes, the older one's result is discarded instead of being
+
     // drawn — this stops fast dragging/typing from showing stale frames out of order.
     private final AtomicLong graphRequestSeq = new AtomicLong(0);
     private PauseTransition graphDebounce;

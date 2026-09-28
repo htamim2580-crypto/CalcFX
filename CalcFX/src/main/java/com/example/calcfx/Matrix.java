@@ -3,10 +3,7 @@ package com.example.calcfx;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-/**
- * Immutable matrix of doubles with the core linear algebra operations.
- * Row reduction uses partial pivoting; values smaller than EPS are treated as zero.
- */
+
 public class Matrix {
 
     private static final double EPS = 1e-9;

@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Immutable complex number a + bi with the standard operations. */
+// Immutable complex number a + bi with the standard operations.
 public record Complex(double re, double im) {
 
     private static final double EPS = 1e-9;

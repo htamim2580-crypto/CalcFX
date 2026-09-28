@@ -14,7 +14,7 @@ public class HelloApplication extends Application {
         scene.getStylesheets().add(
                 HelloApplication.class.getResource("styles.css").toExternalForm()
         );
-        stage.setTitle("CalcFX – Scientific Calculator");
+        stage.setTitle("CalcFX–Scientific Calculator");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();

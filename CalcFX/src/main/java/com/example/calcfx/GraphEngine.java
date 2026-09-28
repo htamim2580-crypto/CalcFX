@@ -9,19 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleBinaryOperator;
 
-/**
- * Parses full equations of x and/or y (e.g. "y = 5x", "y^2 = 5x", "sin(x) = cos(y)")
- * and traces their solution curve using marching squares over a grid.
- * Pure computation — no JavaFX scene access — safe to run on a background thread.
- */
+
 public class GraphEngine {
 
     public record Pt(double x, double y) {}
 
-    /** One equation's traced curve, as line segments in world coordinates, paired with its color. */
+
     public record PlotSeries(Color color, List<double[]> segments) {}
 
-    /** A parsed "LHS = RHS" equation. Its solution set is where LHS(x,y) - RHS(x,y) == 0. */
+
     public static class Equation {
         private final Expression lhs;
         private final Expression rhs;
@@ -43,10 +39,7 @@ public class GraphEngine {
         }
     }
 
-    /**
-     * Parses a typed equation. If there's no "=", the whole thing is treated as
-     * the right-hand side of "y = ...", so plain "sin(x)" still works as before.
-     */
+
     public static Equation parseEquation(String raw) {
         String text = raw.trim();
         if (text.isEmpty()) throw new IllegalArgumentException("Empty expression");
@@ -66,10 +59,7 @@ public class GraphEngine {
         return new Equation(lhs, rhs);
     }
 
-    /**
-     * Traces the zero-contour of an equation across a grid using marching squares.
-     * Returns line segments in world coordinates: {x1, y1, x2, y2}.
-     */
+
     public static List<double[]> traceImplicit(DoubleBinaryOperator fn,
                                                double xMin, double xMax, double yMin, double yMax,
                                                int cols, int rows) {
@@ -77,11 +67,7 @@ public class GraphEngine {
         double dx = (xMax - xMin) / cols;
         double dy = (yMax - yMin) / rows;
 
-        // Sequential on purpose: fn wraps exp4j Expression objects, which keep their
-        // variable values as mutable internal state. Evaluating the same Expression
-        // from multiple threads at once (as a parallel stream would) is a real race —
-        // one thread's setVariable(x, ...) could get overwritten by another's before
-        // either calls evaluate(). Not worth risking wrong curves for the speedup.
+
         double[][] grid = new double[rows + 1][cols + 1];
         for (int j = 0; j <= rows; j++) {
             double y = yMin + j * dy;
@@ -150,7 +136,7 @@ public class GraphEngine {
 
         return s;
     }
-    /** Parses a plain f(x) — no "=" needed — for calculus, where only x varies. */
+
     public static DoubleUnaryOperator parseFunctionOfX(String raw) {
         Expression expr = new ExpressionBuilder(normalize(raw)).variables("x", "y").build();
         return x -> {

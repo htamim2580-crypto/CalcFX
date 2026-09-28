@@ -2,12 +2,7 @@ package com.example.calcfx;
 
 import java.util.function.DoubleUnaryOperator;
 
-/**
- * Numerical calculus: derivative and definite integral of any function of x
- * that can be evaluated as a double -> double. No symbolic manipulation —
- * these approximate a NUMBER (the slope at a point, or the area under a curve),
- * not a new formula.
- */
+
 public class Calculus {
 
     private static final double DERIVATIVE_H = 1e-5;
@@ -24,7 +19,7 @@ public class Calculus {
         return (fPlus - fMinus) / (2 * h);
     }
 
-    /** Composite Simpson's 1/3 Rule over n subintervals (rounded up to even). Error shrinks as O(h⁴). */
+    // Composite Simpson's 1/3 Rule over n subintervals (rounded up to even)
     public static double integrate(DoubleUnaryOperator f, double a, double b, int n) {
         if (n % 2 != 0) n++;
         double h = (b - a) / n;
